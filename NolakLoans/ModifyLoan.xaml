@@ -1,0 +1,85 @@
+﻿<Window x:Class="NolakLoans.ModifyLoan"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:NolakLoans"
+        mc:Ignorable="d"
+        Title="ModifyLoan" Height="450" Width="800" Icon="loans-3_721_420_80_s_c1 (1) (1).ico">
+    <DockPanel>
+        <StackPanel DockPanel.Dock="Left" Width="378" Margin="3,0,5,0" ClipToBounds="True">
+            <StackPanel>
+                <StackPanel Margin="0,4,0,0" Orientation="Horizontal">
+                    <StackPanel Margin="0,0,5,0">
+                        <Label Content="Borrower Name" BorderThickness="0,0,0,5"/>
+                        <TextBox x:Name="borrowerName" BorderThickness="1,1,1,2" />
+                    </StackPanel>
+                    <StackPanel Margin="0,0,5,0">
+                        <Label Content="Loan ID"  BorderThickness="0,0,0,5" />
+                        <TextBox x:Name="loanID" BorderThickness="1,1,1,2" IsEnabled="False" />
+                    </StackPanel>
+                    <StackPanel Margin="0,0,5,0">
+                        <Label Content="Days Late" BorderThickness="0,0,0,5"/>
+                        <TextBox x:Name="daysLate" BorderThickness="1,1,1,2" />
+                    </StackPanel>
+                    <StackPanel Margin="0,0,5,0">
+                        <Label Content="Total Payoff Amt" BorderThickness="0,0,0,5" />
+                        <TextBox x:Name="totalPayoffAmt" BorderThickness="1,1,1,2"  />
+                    </StackPanel>
+                    <StackPanel>
+                        <Label Content="Paid Off"/>
+                        <CheckBox x:Name="paidOff" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,5,0,0" />
+                    </StackPanel>
+                </StackPanel>
+
+                <Label Content="Borrowed Amount(integer multiples of billions)"/>
+                <TextBox x:Name="borrowedAmt" />
+                <Label Content="Interest Rate(Int only, no %)"/>
+                <TextBox x:Name="interestRate" />
+                <Label Content="Balance Remaining"/>
+                <TextBox x:Name="balRemaining"/>
+                <Label Content="Collateral"/>
+                <TextBox x:Name="collateralHeld"/>
+                <Label Content="Loan Duration(Enter integer multiple of months)"/>
+                <TextBox x:Name="loanDurationMonths" />
+                <Label Content="Loan Start Date"/>
+                <DatePicker x:Name="loanStart"/>
+
+                <Label Content="Loan Link"/>
+                <TextBox x:Name="loanLink" Margin="0,0,0,5"/>
+
+
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+                    <Button x:Name="openLink" Content="Open Thread" Margin="0,5,5,0" Click="OpenLink_Click"/>
+                    <Button x:Name="modLoan" Content="Modify Loan" Margin="5,5,0,0" Click="ModLoan_Click"/>
+                </StackPanel>
+            </StackPanel>
+        </StackPanel>
+        <StackPanel DockPanel.Dock="Right" ClipToBounds="True" Margin="5,0,3,0">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center" ClipToBounds="True" Margin="0,0,0,5">
+                <StackPanel Margin="5,0">
+                    <Label Content="Paid From"/>
+                    <TextBox x:Name="paidFrom"/>
+                </StackPanel>
+                <StackPanel Margin="5,0">
+                    <Label Content="Payment Amount"/>
+                    <TextBox x:Name="pmtAmt"/>
+                </StackPanel>
+                <StackPanel VerticalAlignment="Bottom" Margin="5,0,0,0">
+                    <Button x:Name="submitPayment" Click="processPayment" Content="Submit Payment" HorizontalAlignment="Center"/>
+                </StackPanel>
+            </StackPanel>
+            <StackPanel>
+                <ListView x:Name="paymentListView">
+                    <ListView.View>
+                        <GridView>
+                            <GridViewColumn Header="Payment ID" DisplayMemberBinding="{Binding PaymentID}"/>
+                            <GridViewColumn Header="Payment Amount" DisplayMemberBinding="{Binding PmtAmt}"/>
+                            <GridViewColumn Header="From" DisplayMemberBinding="{Binding PaymentFrom}"/>
+                        </GridView>
+                    </ListView.View>
+                </ListView>
+            </StackPanel>
+        </StackPanel>
+    </DockPanel>
+</Window>
