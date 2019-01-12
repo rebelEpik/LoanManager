@@ -29,7 +29,7 @@ namespace NolakLoans
         public GridViewColumnHeader _lastHeaderClicked;
         public ListSortDirection _lastDirection = ListSortDirection.Ascending;
         public GrabAllLoans _loanHelper = new GrabAllLoans();
-
+        public HelperClass _helper;
 
         public ErrorLog _error = new ErrorLog();
 
@@ -45,7 +45,7 @@ namespace NolakLoans
             updateLV.Start();
             if (!File.Exists("Loans.sqlite"))
             {
-                firstRun(this, null);
+                _helper.createDB();
             }
             else
             {
@@ -73,7 +73,10 @@ namespace NolakLoans
                 returnIsk = returnIsk + (BigInteger)l.TotalAmt;
                 this.loanListView.Items.Add(l);
             }
-           
+           foreach(ListViewItem lvi in loanListView.Items)
+            {
+                loanListView.Items
+            }
             totalBorrowedAmt.Content = String.Format("Isk Sent Out: {0:c0}", ((BigInteger)totalAmtOut * 1000000000));
             expectedReturn.Content = String.Format("Expected Return: {0:c0}", returnIsk);
             //
@@ -103,22 +106,7 @@ namespace NolakLoans
             connection.Close();
 
         }
-        private void firstRun(object sender, RoutedEventArgs e)
-        {
-            SQLiteConnection.CreateFile("Loans.sqlite");
-            connection = new SQLiteConnection("Data Source=Loans.sqlite;Version=3;");
-            connection.Open();
-            
-            string createTable = @"CREATE TABLE Loans (id INTEGER PRIMARY KEY AUTOINCREMENT, name varchar(50), amt int, interest int, collateral varchar(50), start varchar(50), duration int, dayslate int, link varchar(150), totalLoanAmt LONG INTEGER, paidOff int, balanceRemaining LONG INTEGER);";
 
-            SQLiteCommand create = new SQLiteCommand(createTable, connection);
-            create.ExecuteNonQuery();
-
-            string createPmtTable = @"CREATE TABLE `Payments` ( `paymentID` INTEGER PRIMARY KEY AUTOINCREMENT, `loanID` INTEGER, `paymentAmt` LONG INTEGER, `paymentFrom` TEXT )";
-            SQLiteCommand com = new SQLiteCommand(createPmtTable, connection);
-            com.ExecuteNonQuery();
-            connection.Close();
-        }
         private void closeMain(object sender, RoutedEventArgs e)
         {
             this.Close();
@@ -411,8 +399,6 @@ namespace NolakLoans
         {
             searchByName = searchLoans.SelectedValue.ToString();
             populateSearchView(returnSearchLoans());
-
-
 
         }
 

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:NolakLoans"
         mc:Ignorable="d"
-        Title="Nolak's Loan Shack Manager" Height="436.134" Width="739.496" Icon="loans-3_721_420_80_s_c1 (1) (1).ico">
+        Title="Nolak's Loan Shack Manager" Height="458.134" Width="746.496" Icon="loans-3_721_420_80_s_c1 (1) (1).ico">
 
     <DockPanel>
 
@@ -13,14 +13,15 @@
             <MenuItem Header="File">
                 <MenuItem Header="Close" Click="closeMain"/>
             </MenuItem>
-            <MenuItem Header="DEV">
-                <MenuItem Header="First Run" Click="firstRun"/>
-            </MenuItem>
             <MenuItem Header="Tools">
                 <MenuItem Header="Backup DB" Click="backupDB"/>
                 <MenuItem Header="Restore DB" Click="restoreDB"/>
             </MenuItem>
         </Menu>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Bottom" ClipToBounds="True">
+            <Label x:Name="totalBorrowedAmt" Content="Test" Margin="0,0,5,0"/>
+            <Label x:Name="expectedReturn" Content="Test" Margin="5,0,3,0"/>
+        </StackPanel>
         <StackPanel DockPanel.Dock="Left" ClipToBounds="True">
             <TabControl ClipToBounds="True">
                 <TabItem Header="Add Loan" ClipToBounds="True">
@@ -53,7 +54,7 @@
                     <DockPanel>
                         <StackPanel ClipToBounds="True">
                             <StackPanel>
-                                <ListView x:Name="loanListView" GridViewColumnHeader.Click="sortColumn"  MouseDoubleClick="selectLoan">
+                                <ListView x:Name="loanListView" GridViewColumnHeader.Click="sortColumn"  MouseDoubleClick="selectLoan" ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.CanContentScroll="False" MaxHeight="355">
 
                                     <ListView.View>
                                         <GridView>
@@ -67,10 +68,7 @@
                                     </ListView.View>
                                 </ListView>
                             </StackPanel>
-                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Bottom">
-                                <Label x:Name="totalBorrowedAmt" Content="Test" Margin="0,0,5,0"/>
-                                <Label x:Name="expectedReturn" Content="Test" Margin="5,0,3,0"/>
-                            </StackPanel>
+
                         </StackPanel>
                     </DockPanel>
                 </TabItem>
@@ -99,6 +97,8 @@
                     </StackPanel>
                 </TabItem>
             </TabControl>
+
         </StackPanel>
+
     </DockPanel>
 </Window>
