@@ -73,10 +73,7 @@ namespace NolakLoans
                 returnIsk = returnIsk + (BigInteger)l.TotalAmt;
                 this.loanListView.Items.Add(l);
             }
-           foreach(ListViewItem lvi in loanListView.Items)
-            {
-                loanListView.Items
-            }
+
             totalBorrowedAmt.Content = String.Format("Isk Sent Out: {0:c0}", ((BigInteger)totalAmtOut * 1000000000));
             expectedReturn.Content = String.Format("Expected Return: {0:c0}", returnIsk);
             //
