@@ -147,6 +147,7 @@
     <Compile Include="Helper\ErrorLog.cs" />
     <Compile Include="Helper\GrabLoans.cs" />
     <Compile Include="Helper\HelperClass.cs" />
+    <Compile Include="Helper\InsertLoansHandler.cs" />
     <Compile Include="ModifyLoan.xaml.cs">
       <DependentUpon>ModifyLoan.xaml</DependentUpon>
     </Compile>

@@ -78,6 +78,18 @@ namespace NolakLoans.Types
             }
         }
 
+        public string Late
+        {
+            get
+            {
+                if (DaysLate.ToString().Contains("-"))
+                {
+                    return "0";
+                }
+                return "1";
+            }
+        }
+
 
         
 
@@ -85,6 +97,21 @@ namespace NolakLoans.Types
         {
 
             return (((decimal)BAmt * 1000000000) * (IntRate / 100) * LoanDuration) + ((decimal)BAmt * 1000000000);
+        }
+
+        public bool Current
+        {
+            get
+            {
+                if (DaysLate.ToString().Contains("-"))
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
         }
 
         

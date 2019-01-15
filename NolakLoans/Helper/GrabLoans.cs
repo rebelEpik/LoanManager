@@ -21,6 +21,10 @@ namespace NolakLoans.Helper
 
         }
 
+        private string searchByName;
+
+        public string SearchByName { get => searchByName; set => searchByName = value; }
+
         public List<Loan> returnAllLoans()
         {
             List<Loan> allLoans = new List<Loan>();
@@ -71,7 +75,7 @@ namespace NolakLoans.Helper
             return allLoans;
         }
 
-        public List<Loan> returnSearchLoans(string name)
+        public List<Loan> returnSearchLoans()
         {
             List<Loan> foundLoans = new List<Loan>();
             try
@@ -80,7 +84,7 @@ namespace NolakLoans.Helper
                 {
                     con.Open();
 
-                    string stm = "SELECT id, name, amt, interest, collateral, start, duration, dayslate, link, totalLoanAmt, paidOff, balanceRemaining FROM Loans WHERE name='" + name + "'";
+                    string stm = "SELECT id, name, amt, interest, collateral, start, duration, dayslate, link, totalLoanAmt, paidOff, balanceRemaining FROM Loans WHERE name='" + SearchByName + "'";
 
                     using (SQLiteCommand cmd = new SQLiteCommand(stm, con))
                     {
