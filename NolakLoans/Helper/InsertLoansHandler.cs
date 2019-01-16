@@ -1,10 +1,5 @@
 ﻿using NolakLoans.Types;
-using System;
-using System.Collections.Generic;
 using System.Data.SQLite;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NolakLoans.Helper
 {
@@ -36,6 +31,30 @@ namespace NolakLoans.Helper
             insertCommand.ExecuteNonQuery();
             connection.Close();
 
+        }
+
+        public void updateLoan(Loan loanToUpdate)
+        {
+            SQLiteConnection connection = new SQLiteConnection(_helper.ConnectionString);
+            connection.Open();
+            SQLiteCommand updateCommand = new SQLiteCommand();
+            updateCommand.CommandText = @"UPDATE Loans SET name=@param1, amt=@param2, interest=@param3, collateral=@param4, start=@param5, duration=@param6, dayslate=@param7, link=@param8, totalLoanAmt=@param9, paidOff=@param10, balanceRemaining=@param11 WHERE id=@param12";
+            updateCommand.Parameters.AddWithValue("@param1", loanToUpdate.BName);
+            updateCommand.Parameters.AddWithValue("@param2", loanToUpdate.BAmt);
+            updateCommand.Parameters.AddWithValue("@param3", loanToUpdate.IntRate);
+            updateCommand.Parameters.AddWithValue("@param4", loanToUpdate.Collat);
+            updateCommand.Parameters.AddWithValue("@param5", loanToUpdate.LoanStart);
+            updateCommand.Parameters.AddWithValue("@param6", loanToUpdate.LoanDuration);
+            updateCommand.Parameters.AddWithValue("@param7", loanToUpdate.DaysLate);
+            updateCommand.Parameters.AddWithValue("@param8", loanToUpdate.LoanLink);
+            updateCommand.Parameters.AddWithValue("@param9", loanToUpdate.TotalAmt);
+            updateCommand.Parameters.AddWithValue("@param10", loanToUpdate.PaidOff);
+            updateCommand.Parameters.AddWithValue("@param11", loanToUpdate.BalanceRemaining);
+            updateCommand.Parameters.AddWithValue("@param12", loanToUpdate.LoanID);
+
+            updateCommand.Connection = connection;
+            updateCommand.ExecuteNonQuery();
+            connection.Close();
         }
     }
 }

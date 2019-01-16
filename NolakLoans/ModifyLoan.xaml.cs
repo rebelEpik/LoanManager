@@ -1,20 +1,10 @@
-﻿using NolakLoans.Types;
+﻿using NolakLoans.Helper;
+using NolakLoans.Types;
 using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Diagnostics;
-using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace NolakLoans
 {
@@ -25,6 +15,7 @@ namespace NolakLoans
     {
         public Loan loan;
         public SQLiteConnection connection;
+        public ErrorLog _errorLog = new ErrorLog();
         
         public ModifyLoan(Loan currentLoan)
         {
@@ -37,50 +28,78 @@ namespace NolakLoans
 
         private void populateLoanView(List<Payment> payments)
         {
-            this.paymentListView.Items.Clear();
-
-            foreach (Payment p in payments)
+            try
             {
-                this.paymentListView.Items.Add(p);
+                this.paymentListView.Items.Clear();
+
+                foreach (Payment p in payments)
+                {
+                    this.paymentListView.Items.Add(p);
+                }
+            } catch(Exception e)
+            {
+                _errorLog.LogToErrorFile(e);
             }
+
         }
 
         private void loadGui(Loan loan)
         {
-            borrowerName.Text = loan.BName;
-            borrowedAmt.Text = loan.BAmt.ToString();
-            interestRate.Text = loan.IntRate.ToString();
-            loanID.Text = loan.LoanID.ToString();
-            collateralHeld.Text = loan.Collat;
-            loanStart.SelectedDate = loan.LoanStart;
-            loanDurationMonths.Text = loan.LoanDuration.ToString();
-            loanLink.Text = loan.LoanLink;
-            daysLate.Text = (DateTime.Today - loan.LoanStart.AddDays(loan.LoanDuration * 30)).TotalDays.ToString();
-            balRemaining.Text = String.Format("{0:c0}", loan.BalanceRemaining);
-
-            if (loan.PaidOff == 1)
+            try
             {
-                paidOff.IsChecked = true;
+                borrowerName.Text = loan.BName;
+                borrowedAmt.Text = loan.BAmt.ToString();
+                interestRate.Text = loan.IntRate.ToString();
+                loanID.Text = loan.LoanID.ToString();
+                collateralHeld.Text = loan.Collat;
+                loanStart.SelectedDate = loan.LoanStart;
+                loanDurationMonths.Text = loan.LoanDuration.ToString();
+                loanLink.Text = loan.LoanLink;
+                daysLate.Text = (DateTime.Today - loan.LoanStart.AddDays(loan.LoanDuration * 30)).TotalDays.ToString();
+                balRemaining.Text = String.Format("{0:c0}", loan.BalanceRemaining);
+
+                if (loan.PaidOff == 1)
+                {
+                    paidOff.IsChecked = true;
+                }
+                else
+                {
+                    paidOff.IsChecked = false;
+                }
+
+                totalPayoffAmt.Text = String.Format("{0:c0}", loan.getTotalLoan());
             }
-            else
+            catch(Exception e)
             {
-                paidOff.IsChecked = false;
+                _errorLog.LogToErrorFile(e);
+            }
+            try
+            {
+                List<Payment> payments = getPayments(loan.LoanID);
+                this.paymentListView.Items.Clear();
+                foreach (Payment p in payments)
+                {
+                    this.paymentListView.Items.Add(p);
+                }
+            }
+            catch(Exception e)
+            {
+                _errorLog.LogToErrorFile(e);
             }
 
-            totalPayoffAmt.Text = String.Format("{0:c0}", loan.getTotalLoan());
-
-            List<Payment> payments = getPayments(loan.LoanID);
-            this.paymentListView.Items.Clear();
-            foreach(Payment p in payments)
-            {
-                this.paymentListView.Items.Add(p);
-            }
         }
 
-        private void OpenLink_Click(object sender, RoutedEventArgs e)
+        private void OpenLink_Click(object sender, RoutedEventArgs eV)
         {
+            try
+            {
             Uri url = new Uri(loan.LoanLink);
             Process.Start(url.AbsoluteUri);
+            } catch(Exception e)
+            {
+                _errorLog.LogToErrorFile(e);
+            }
+
         }
         private void updateLoan(Loan loanToUpdate)
         {
@@ -169,6 +188,8 @@ namespace NolakLoans
                 MessageBox.Show(ef.Message);
             }
 
+            this.Close();
+
             
         }
 
@@ -208,6 +229,49 @@ namespace NolakLoans
             }catch(Exception e)
             {
 
+            }
+            connection.Close();
+        }
+
+
+
+        private void deletePaymentClick(object sender, RoutedEventArgs e)
+        {
+            if(paymentListView.SelectedItem != null)
+            {
+                Loan l = loan;
+                Payment p = paymentListView.SelectedItem as Payment;
+                l.BalanceRemaining = l.BalanceRemaining + (decimal)p.PaymentAmt;
+
+                deletePaymentFromScreen(p);
+                loadGui(l);
+                updateLoan(l);
+            }
+            else
+            {
+                MessageBox.Show("Please select a payment");
+            }
+            
+        }
+
+        private void deletePaymentFromScreen(Payment p)
+        {
+            connection = new SQLiteConnection("Data Source=Loans.sqlite;Version=3");
+            connection.Open();
+            SQLiteCommand pmtDltCommand = new SQLiteCommand()
+            {
+                CommandText = "DELETE FROM Payments WHERE paymentID=@param1"
+            };
+            pmtDltCommand.Parameters.AddWithValue("@param1", p.PaymentID);
+            pmtDltCommand.Connection = connection;
+            
+            try
+            {
+                pmtDltCommand.ExecuteNonQuery();
+            }
+            catch(Exception e)
+            {
+              
             }
             connection.Close();
         }

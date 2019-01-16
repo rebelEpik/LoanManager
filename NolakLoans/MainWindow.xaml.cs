@@ -1,22 +1,15 @@
-﻿using NolakLoans.Properties;
+﻿using NolakLoans.Helper;
 using NolakLoans.Types;
 using System;
 using System.Collections.Generic;
-using System.Data.SQLite;
-using System.Globalization;
-using System.IO;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Threading;
-using System.Numerics;
-using System.ComponentModel;
-using System.Linq;
-using NolakLoans.Helper;
-using System.Windows.Media;
-using System.Collections;
 using System.Data;
+using System.Data.SQLite;
+using System.IO;
+using System.Linq;
+using System.Numerics;
+using System.Windows;
 using System.Windows.Input;
+using System.Windows.Threading;
 
 namespace NolakLoans
 {
@@ -25,21 +18,15 @@ namespace NolakLoans
     /// </summary>
     public partial class MainWindow : Window
     {
-        public SQLiteConnection connection;
-
         public DispatcherTimer updateLV = new DispatcherTimer();
         public GrabAllLoans _loanHelper = new GrabAllLoans();
         public InsertLoansHandler _insertHelper = new InsertLoansHandler();
         public HelperClass _helper;
-        public List<Loan> allLoans;
-
         public ErrorLog _error = new ErrorLog();
-
 
         public MainWindow()
         {
             InitializeComponent();
-            allLoans = _loanHelper.returnAllLoans();
 
             currentLoansDG.ItemsSource = _loanHelper.returnAllLoans();
             updateLV.Tick += updateListView;
@@ -151,6 +138,7 @@ namespace NolakLoans
 
         private void populateLoanView(List<Loan> loans)
         {
+            loans.RemoveAll(l => l.BalanceRemaining <= 0);
             currentLoansDG.ItemsSource = null;
             currentLoansDG.ItemsSource = loans;
             currentLoansDG.Items.Refresh();
@@ -160,14 +148,18 @@ namespace NolakLoans
             BigInteger returnIsk = 0;
             foreach (Loan l in loans)
             {
-                totalAmtOut = totalAmtOut + (Int32)l.BAmt;
-                returnIsk = returnIsk + (BigInteger)l.TotalAmt;
+                if (l.BalanceRemaining > 0)
+                {
+                    totalAmtOut = totalAmtOut + (Int32)l.BAmt;
+                    returnIsk = returnIsk + (BigInteger)l.TotalAmt;
+                }
             }
             totalBorrowedAmt.Content = String.Format("Isk Sent Out: {0:c0}", ((BigInteger)totalAmtOut * 1000000000));
             expectedReturn.Content = String.Format("Expected Return: {0:c0}", returnIsk);
         }
         private void populateSearchView(List<Loan> loans)
         {
+            
             searchLoansDG.ItemsSource = null;
             searchLoansDG.ItemsSource = loans;
             searchLoansDG.Items.Refresh();
@@ -198,13 +190,27 @@ namespace NolakLoans
             searchLoans.Items.Clear();
             foreach(Loan l in loans)
             {
-                if (!searchLoans.Items.Contains(l.BName))
+                if (!searchLoans.Items.Contains(l.BName.ToLower()))
                 {
-                    searchLoans.Items.Add(l.BName);
+                    searchLoans.Items.Add(l.BName.ToLower());
                 }
             }
         }
 
+        private void FixBorrowerNames(object sender, RoutedEventArgs e)
+        {
+            List<Loan> AllLoans = _loanHelper.returnAllLoans();
+            foreach(Loan l in AllLoans)
+            {
+                l.BName = l.BName.ToLower();
+                _insertHelper.updateLoan(l);
+            }
+        }
+
+        private void openPreferences(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 
 

@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:NolakLoans"
         mc:Ignorable="d"
-        Title="ModifyLoan" Height="450" Width="800" Icon="loans-3_721_420_80_s_c1 (1) (1).ico">
+        Title="Modify Loan" Height="450" Width="800" Icon="loans-3_721_420_80_s_c1 (1) (1).ico">
     <DockPanel>
         <StackPanel DockPanel.Dock="Left" Width="378" Margin="3,0,5,0" ClipToBounds="True">
             <StackPanel>
@@ -67,6 +67,9 @@
                 </StackPanel>
                 <StackPanel VerticalAlignment="Bottom" Margin="5,0,0,0">
                     <Button x:Name="submitPayment" Click="processPayment" Content="Submit Payment" HorizontalAlignment="Center"/>
+                </StackPanel>
+                <StackPanel VerticalAlignment="Bottom" Margin="5,0,0,0">
+                    <Button x:Name="deletePayment" Click="deletePaymentClick" Content="Delete Payment" HorizontalAlignment="Center"/>
                 </StackPanel>
             </StackPanel>
             <StackPanel>

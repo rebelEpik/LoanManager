@@ -2,9 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NolakLoans.Helper
 {
@@ -16,14 +13,16 @@ namespace NolakLoans.Helper
     {
         public HelperClass _helper = new HelperClass();
         public ErrorLog _errorLog = new ErrorLog();
+
+        private string searchByName;
+        public string SearchByName { get => searchByName; set => searchByName = value; }
+
         public GrabAllLoans()
         {
 
         }
 
-        private string searchByName;
 
-        public string SearchByName { get => searchByName; set => searchByName = value; }
 
         public List<Loan> returnAllLoans()
         {
@@ -74,7 +73,6 @@ namespace NolakLoans.Helper
 
             return allLoans;
         }
-
         public List<Loan> returnSearchLoans()
         {
             List<Loan> foundLoans = new List<Loan>();

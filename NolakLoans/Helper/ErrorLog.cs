@@ -1,31 +1,31 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace NolakLoans.Helper
 {
     public class ErrorLog
     {
-        private string _errorPath;
+        private string _errorPath = Environment.CurrentDirectory + @"\Logs\ErrorLog.txt";
         public ErrorLog()
         {
             if (!Directory.Exists(@"\Logs"))
             {
                 Directory.CreateDirectory(Environment.CurrentDirectory + @"\Logs");
             }
-            if(!File.Exists(@"\Logs\ErrorLog" + DateTime.Today.ToString("MM.dd.yyyy")))
+            if(!File.Exists(@"\Logs\ErrorLog.txt"))
             {
-                _errorPath = Environment.CurrentDirectory + @"\Logs\ErrorLog" + DateTime.Today.ToString("MM.dd.yyyy") + ".txt";
-                //File.Create(_errorPath);
+                File.Create(_errorPath);
             }
         }
 
         public void LogToErrorFile(Exception e)
         {
-            File.AppendAllText(_errorPath, e.Message.ToString());
+            
+            File.AppendAllText(_errorPath, "-----------------" + DateTime.Now.ToString() + "-----------------" + Environment.NewLine);
+            File.AppendAllText(_errorPath, e.Message.ToString() + Environment.NewLine);
+            File.AppendAllText(_errorPath, "----------------------------------" + Environment.NewLine);
+            File.AppendAllText(_errorPath, e.Source.ToString() + Environment.NewLine + e.StackTrace.ToString() + Environment.NewLine);
+            
         }
     }
 }

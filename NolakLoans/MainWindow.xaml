@@ -11,11 +11,15 @@
 
         <Menu DockPanel.Dock="Top" ClipToBounds="True">
             <MenuItem Header="File">
+                <MenuItem Header="Preferences" Click="openPreferences"/>
+                <Separator/>
                 <MenuItem Header="Close" Click="closeMain"/>
             </MenuItem>
             <MenuItem Header="Tools">
                 <MenuItem Header="Backup DB" Click="backupDB"/>
                 <MenuItem Header="Restore DB" Click="restoreDB"/>
+                <Separator/>
+                <MenuItem Header="Fix Borrower Names" Click="FixBorrowerNames"/>
             </MenuItem>
         </Menu>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" DockPanel.Dock="Bottom" ClipToBounds="True">
