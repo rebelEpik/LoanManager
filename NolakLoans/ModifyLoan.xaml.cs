@@ -16,6 +16,8 @@ namespace NolakLoans
         public Loan loan;
         public SQLiteConnection connection;
         public ErrorLog _errorLog = new ErrorLog();
+        public InsertLoansHandler _insertHelper = new InsertLoansHandler();
+        public GrabAllLoans _loansHelper = new GrabAllLoans();
         
         public ModifyLoan(Loan currentLoan)
         {
@@ -75,7 +77,7 @@ namespace NolakLoans
             }
             try
             {
-                List<Payment> payments = getPayments(loan.LoanID);
+                List<Payment> payments = _loansHelper.getPayments(loan.LoanID);
                 this.paymentListView.Items.Clear();
                 foreach (Payment p in payments)
                 {
@@ -100,59 +102,7 @@ namespace NolakLoans
                 _errorLog.LogToErrorFile(e);
             }
 
-        }
-        private void updateLoan(Loan loanToUpdate)
-        {
-            connection = new SQLiteConnection("Data Source=Loans.sqlite;Version=3;");
-            connection.Open();
-            SQLiteCommand updateCommand = new SQLiteCommand();
-            updateCommand.CommandText = @"UPDATE Loans SET name=@param1, amt=@param2, interest=@param3, collateral=@param4, start=@param5, duration=@param6, dayslate=@param7, link=@param8, totalLoanAmt=@param9, paidOff=@param10, balanceRemaining=@param11 WHERE id=@param12";
-            updateCommand.Parameters.AddWithValue("@param1", loanToUpdate.BName);
-            updateCommand.Parameters.AddWithValue("@param2", loanToUpdate.BAmt);
-            updateCommand.Parameters.AddWithValue("@param3", loanToUpdate.IntRate);
-            updateCommand.Parameters.AddWithValue("@param4", loanToUpdate.Collat);
-            updateCommand.Parameters.AddWithValue("@param5", loanToUpdate.LoanStart);
-            updateCommand.Parameters.AddWithValue("@param6", loanToUpdate.LoanDuration);
-            updateCommand.Parameters.AddWithValue("@param7", loanToUpdate.DaysLate);
-            updateCommand.Parameters.AddWithValue("@param8", loanToUpdate.LoanLink);
-            updateCommand.Parameters.AddWithValue("@param9", loanToUpdate.TotalAmt);
-            updateCommand.Parameters.AddWithValue("@param10", loanToUpdate.PaidOff);
-            updateCommand.Parameters.AddWithValue("@param11", loanToUpdate.BalanceRemaining);
-            updateCommand.Parameters.AddWithValue("@param12", loanToUpdate.LoanID);
-
-            updateCommand.Connection = connection;
-            updateCommand.ExecuteNonQuery();
-            connection.Close();
-        }
-        private List<Payment> getPayments(int loanID)
-        {
-            List<Payment> allPayments = new List<Payment>();
-            using (SQLiteConnection con = new SQLiteConnection("Data Source=Loans.sqlite;Version=3;"))
-            {
-                con.Open();
-
-                string stm = "SELECT * FROM Payments WHERE loanID=" + loanID.ToString() + " order by paymentID asc";
-
-                using (SQLiteCommand cmd = new SQLiteCommand(stm, con))
-                {
-                    using (SQLiteDataReader rdr = cmd.ExecuteReader())
-                    {
-                        while (rdr.Read())
-                        {
-                            Payment p = new Payment()
-                            {
-                                PaymentAmt = Convert.ToDouble(rdr["paymentAmt"].ToString()),
-                                PaymentFrom = rdr["paymentFrom"].ToString(),
-                                PaymentID = Convert.ToInt32(rdr["paymentID"].ToString())
-                            };
-                            allPayments.Add(p);
-                        }
-                    }
-                }
-                con.Close();
-            }
-            return allPayments;
-        }
+        }        
         private void ModLoan_Click(object sender, RoutedEventArgs e)
         {
             try
@@ -181,11 +131,11 @@ namespace NolakLoans
                 {
                     modifiedLoan.PaidOff = 0;
                 }
-                updateLoan(modifiedLoan);
+                _insertHelper.updateLoan(modifiedLoan);
                 loadGui(modifiedLoan);
             }catch(Exception ef)
             {
-                MessageBox.Show(ef.Message);
+                _errorLog.LogToErrorFile(ef);
             }
 
             this.Close();
@@ -196,43 +146,28 @@ namespace NolakLoans
         private void processPayment(object sender, RoutedEventArgs e)
         {
             Loan l = loan;
-            Payment p = new Payment()
-            {
-                PaymentAmt = Convert.ToDouble(pmtAmt.Text),
-                PaymentFrom = paidFrom.Text,
-                LoanID = loan.LoanID
-            };
-
-            insertPayment(p);
-
-            l.BalanceRemaining = l.BalanceRemaining - Convert.ToDecimal(pmtAmt.Text);
-            loadGui(l);
-            updateLoan(l);
-            
-            paidFrom.Text = "";
-            pmtAmt.Text = "";
-        }
-
-        private void insertPayment(Payment p)
-        {
-            connection = new SQLiteConnection("Data Source=Loans.sqlite;Version=3;");
-            connection.Open();
-            SQLiteCommand pmtInsertCommand = new SQLiteCommand();
-            pmtInsertCommand.CommandText = "INSERT INTO Payments (loanID, paymentAmt, paymentFrom) VALUES (@param1, @param2, @param3)";
-            pmtInsertCommand.Connection = connection;
-            pmtInsertCommand.Parameters.AddWithValue("@param1", p.LoanID);
-            pmtInsertCommand.Parameters.AddWithValue("@param2", p.PaymentAmt);
-            pmtInsertCommand.Parameters.AddWithValue("@param3", p.PaymentFrom);
             try
             {
-                pmtInsertCommand.ExecuteNonQuery();
-            }catch(Exception e)
-            {
 
+                Payment p = new Payment()
+                {
+                    PaymentAmt = Convert.ToDouble(pmtAmt.Text),
+                    PaymentFrom = paidFrom.Text,
+                    LoanID = loan.LoanID
+                };
+                _insertHelper.insertPayment(p);
+                l.BalanceRemaining = l.BalanceRemaining - Convert.ToDecimal(pmtAmt.Text);
+                loadGui(l);
+                _insertHelper.updateLoan(l);
+
+                paidFrom.Text = "";
+                pmtAmt.Text = "";
             }
-            connection.Close();
+            catch (Exception ef)
+            {
+                _errorLog.LogToErrorFile(ef);
+            }
         }
-
 
 
         private void deletePaymentClick(object sender, RoutedEventArgs e)
@@ -245,7 +180,7 @@ namespace NolakLoans
 
                 deletePaymentFromScreen(p);
                 loadGui(l);
-                updateLoan(l);
+                _insertHelper.updateLoan(l);
             }
             else
             {

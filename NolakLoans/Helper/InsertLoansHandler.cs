@@ -1,4 +1,5 @@
 ﻿using NolakLoans.Types;
+using System;
 using System.Data.SQLite;
 
 namespace NolakLoans.Helper
@@ -6,6 +7,7 @@ namespace NolakLoans.Helper
     public class InsertLoansHandler
     {
         HelperClass _helper = new HelperClass();
+        ErrorLog _errorLog = new ErrorLog();
         public void insertLoan(Loan currentLoan)
         {
             SQLiteConnection connection = new SQLiteConnection(_helper.ConnectionString);
@@ -55,6 +57,36 @@ namespace NolakLoans.Helper
             updateCommand.Connection = connection;
             updateCommand.ExecuteNonQuery();
             connection.Close();
+        }
+
+        public void insertPayment(Payment p)
+        {
+            try
+            {
+                SQLiteConnection connection = new SQLiteConnection(_helper.ConnectionString);
+                connection.Open();
+                SQLiteCommand pmtInsertCommand = new SQLiteCommand();
+                pmtInsertCommand.CommandText = "INSERT INTO Payments (loanID, paymentAmt, paymentFrom) VALUES (@param1, @param2, @param3)";
+                pmtInsertCommand.Connection = connection;
+                pmtInsertCommand.Parameters.AddWithValue("@param1", p.LoanID);
+                pmtInsertCommand.Parameters.AddWithValue("@param2", p.PaymentAmt);
+                pmtInsertCommand.Parameters.AddWithValue("@param3", p.PaymentFrom);
+
+                try
+                {
+                    pmtInsertCommand.ExecuteNonQuery();
+                    connection.Close();
+                }
+                catch (Exception e)
+                {
+                    _errorLog.LogToErrorFile(e);
+                }
+            }
+            catch (Exception ef)
+            {
+                _errorLog.LogToErrorFile(ef);
+            }
+
         }
     }
 }

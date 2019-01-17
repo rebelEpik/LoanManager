@@ -12,7 +12,7 @@ namespace NolakLoans.Helper
             {
                 Directory.CreateDirectory(Environment.CurrentDirectory + @"\Logs");
             }
-            if(!File.Exists(@"\Logs\ErrorLog.txt"))
+            if(!File.Exists(_errorPath))
             {
                 File.Create(_errorPath);
             }

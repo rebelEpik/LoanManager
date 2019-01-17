@@ -117,5 +117,36 @@ namespace NolakLoans.Helper
             }
             return foundLoans;
         }
+
+
+        public List<Payment> getPayments(int loanID)
+        {
+            List<Payment> allPayments = new List<Payment>();
+            using (SQLiteConnection con = new SQLiteConnection("Data Source=Loans.sqlite;Version=3;"))
+            {
+                con.Open();
+
+                string stm = "SELECT * FROM Payments WHERE loanID=" + loanID.ToString() + " order by paymentID asc";
+
+                using (SQLiteCommand cmd = new SQLiteCommand(stm, con))
+                {
+                    using (SQLiteDataReader rdr = cmd.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            Payment p = new Payment()
+                            {
+                                PaymentAmt = Convert.ToDouble(rdr["paymentAmt"].ToString()),
+                                PaymentFrom = rdr["paymentFrom"].ToString(),
+                                PaymentID = Convert.ToInt32(rdr["paymentID"].ToString())
+                            };
+                            allPayments.Add(p);
+                        }
+                    }
+                }
+                con.Close();
+            }
+            return allPayments;
+        }
     }
 }
