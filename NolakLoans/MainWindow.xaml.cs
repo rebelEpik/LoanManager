@@ -21,17 +21,12 @@ namespace NolakLoans
         public DispatcherTimer updateLV = new DispatcherTimer();
         public GrabAllLoans _loanHelper = new GrabAllLoans();
         public InsertLoansHandler _insertHelper = new InsertLoansHandler();
-        public HelperClass _helper;
+        public HelperClass _helper = new HelperClass();
         public ErrorLog _error = new ErrorLog();
 
         public MainWindow()
         {
             InitializeComponent();
-
-            currentLoansDG.ItemsSource = _loanHelper.returnAllLoans();
-            updateLV.Tick += updateListView;
-            updateLV.Interval = new TimeSpan(0, 0, 30);
-            updateLV.Start();
             if (!File.Exists("Loans.sqlite"))
             {
                 _helper.createDB();
@@ -40,6 +35,11 @@ namespace NolakLoans
             {
                 populateLoanView(_loanHelper.returnAllLoans());
             }
+            currentLoansDG.ItemsSource = _loanHelper.returnAllLoans();
+            updateLV.Tick += updateListView;
+            updateLV.Interval = new TimeSpan(0, 0, 30);
+            updateLV.Start();
+
 
             loadComboBox();
 
